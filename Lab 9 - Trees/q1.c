@@ -19,142 +19,102 @@ typedef struct Node {
 } Node;
 
 Node* createNode(int data) {
-    Node* newNode = (Node*)malloc(sizeof(Node));
-    newNode->data = data;
-    newNode->left = newNode->right = NULL;
-    return newNode;
+    Node* n = (Node*)malloc(sizeof(Node));
+    n->data = data;
+    n->left = n->right = NULL;
+    return n;
 }
 
-void inorderIterative(Node* root) {
-    if (root == NULL) return;
-
-    Node* stack[100];
-    int top = -1;
-    Node* current = root;
-
-    while (current != NULL || top != -1) {
-        while (current != NULL) {
-            stack[++top] = current;
-            current = current->left;
-        }
-        current = stack[top--];
-        printf("%d ", current->data);
-        current = current->right;
+void inorder(Node* r) {
+    if (!r) return;
+    Node* stack[100]; int top = -1;
+    while (r || top != -1) {
+        while (r) { stack[++top] = r; r = r->left; }
+        r = stack[top--];
+        printf("%d ", r->data);
+        r = r->right;
     }
 }
 
-void preorderIterative(Node* root) {
-    if (root == NULL) return;
-
-    Node* stack[100];
-    int top = -1;
-    stack[++top] = root;
-
+void preorder(Node* r) {
+    if (!r) return;
+    Node* stack[100]; int top = -1;
+    stack[++top] = r;
     while (top != -1) {
-        Node* current = stack[top--];
-        printf("%d ", current->data);
-
-        if (current->right) stack[++top] = current->right;
-        if (current->left) stack[++top] = current->left;
+        r = stack[top--];
+        printf("%d ", r->data);
+        if (r->right) stack[++top] = r->right;
+        if (r->left) stack[++top] = r->left;
     }
 }
 
-void postorderIterative(Node* root) {
-    if (root == NULL) return;
-
-    Node* stack1[100], *stack2[100];
-    int top1 = -1, top2 = -1;
-    stack1[++top1] = root;
-
-    while (top1 != -1) {
-        Node* current = stack1[top1--];
-        stack2[++top2] = current;
-
-        if (current->left) stack1[++top1] = current->left;
-        if (current->right) stack1[++top1] = current->right;
+void postorder(Node* r) {
+    if (!r) return;
+    Node *s1[100], *s2[100];
+    int t1 = -1, t2 = -1;
+    s1[++t1] = r;
+    while (t1 != -1) {
+        r = s1[t1--];
+        s2[++t2] = r;
+        if (r->left) s1[++t1] = r->left;
+        if (r->right) s1[++t1] = r->right;
     }
-
-    while (top2 != -1) {
-        printf("%d ", stack2[top2--]->data);
-    }
+    while (t2 != -1) printf("%d ", s2[t2--]->data);
 }
 
-Node* findParent(Node* root, int target) {
-    if (root == NULL || (root->left == NULL && root->right == NULL)) return NULL;
-
-    if ((root->left && root->left->data == target) || (root->right && root->right->data == target)) {
-        return root;
-    }
-
-    Node* leftSearch = findParent(root->left, target);
-    if (leftSearch) return leftSearch;
-
-    return findParent(root->right, target);
+Node* findParent(Node* r, int x) {
+    if (!r || (!r->left && !r->right)) return NULL;
+    if ((r->left && r->left->data == x) || (r->right && r->right->data == x)) return r;
+    Node* p = findParent(r->left, x);
+    return p ? p : findParent(r->right, x);
 }
 
-int height(Node* root) {
-    if (root == NULL) return 0;
-    int leftHeight = height(root->left);
-    int rightHeight = height(root->right);
-    return (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
+int height(Node* r) {
+    if (!r) return 0;
+    int lh = height(r->left), rh = height(r->right);
+    return (lh > rh ? lh : rh) + 1;
 }
 
-int printAncestors(Node* root, int target) {
-    if (root == NULL) return 0;
-    if (root->data == target) return 1;
-
-    if (printAncestors(root->left, target) || printAncestors(root->right, target)) {
-        printf("%d ", root->data);
+int printAnc(Node* r, int x) {
+    if (!r) return 0;
+    if (r->data == x) return 1;
+    if (printAnc(r->left, x) || printAnc(r->right, x)) {
+        printf("%d ", r->data);
         return 1;
     }
     return 0;
 }
 
-int countLeafNodes(Node* root) {
-    if (root == NULL) return 0;
-    if (root->left == NULL && root->right == NULL) return 1;
-    return countLeafNodes(root->left) + countLeafNodes(root->right);
+int countLeaf(Node* r) {
+    if (!r) return 0;
+    if (!r->left && !r->right) return 1;
+    return countLeaf(r->left) + countLeaf(r->right);
 }
 
 int main() {
-    Node* root = createNode(1);
-    root->left = createNode(2);
-    root->right = createNode(3);
-    root->left->left = createNode(4);
-    root->left->right = createNode(5);
-    root->right->left = createNode(6);
-    root->right->right = createNode(7);
+    Node* r = createNode(1);
+    r->left = createNode(2);
+    r->right = createNode(3);
+    r->left->left = createNode(4);
+    r->left->right = createNode(5);
+    r->right->left = createNode(6);
+    r->right->right = createNode(7);
 
-    printf("Inorder Traversal: ");
-    inorderIterative(root);
-    printf("\n");
+    printf("Inorder: "); inorder(r);
+    printf("\nPreorder: "); preorder(r);
+    printf("\nPostorder: "); postorder(r);
 
-    printf("Preorder Traversal: ");
-    preorderIterative(root);
-    printf("\n");
+    int x = 5;
+    Node* p = findParent(r, x);
+    if (p) printf("\nParent of %d: %d", x, p->data);
+    else printf("\nParent of %d not found or it is root.", x);
 
-    printf("Postorder Traversal: ");
-    postorderIterative(root);
-    printf("\n");
-
-    int target = 5;
-    Node* parent = findParent(root, target);
-    if (parent) {
-        printf("Parent of %d: %d\n", target, parent->data);
-    } else {
-        printf("Parent of %d not found or it is the root node.\n", target);
-    }
-
-    printf("Height of tree: %d\n", height(root));
-
-    printf("Ancestors of %d: ", target);
-    if (!printAncestors(root, target)) {
-        printf("No ancestors found or node does not exist.\n");
-    }
-    printf("\n");
-
-    printf("Number of leaf nodes: %d\n", countLeafNodes(root));
+    printf("\nHeight: %d", height(r));
+    printf("\nAncestors of %d: ", x);
+    if (!printAnc(r, x)) printf("None");
+    printf("\nLeaf nodes: %d\n", countLeaf(r));
 
     return 0;
 }
+
 
