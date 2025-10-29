@@ -75,7 +75,7 @@ void printTreeVisual(Node *root, int space)
 int main()
 {
     Node *root = createBinaryTree();
-    printf("Preorder Traversal of the binary tree:\n");
+    printf("Level order traversal of the binary tree:\n");
 
     printTree(root);
     printf("\n");

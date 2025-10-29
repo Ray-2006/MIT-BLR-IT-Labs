@@ -7,6 +7,7 @@ typedef struct Node
     struct Node *left, *right;
 } Node;
 
+// ---------- Utility ----------
 Node *createNode(int d)
 {
     Node *n = malloc(sizeof(Node));
@@ -154,7 +155,7 @@ int main()
     int ch, v;
     while (1)
     {
-        printf("\n1.Insert BST  2.Traverse BST  3.Search  4.Delete  5.Min/Max  6.Insert AVL  7.AVL Inorder  8.Exit\nChoice: ");
+        printf("\n1.Insert BST  2.Traverse BST  3.Search  4.Delete  5.Min/Max  6.Insert AVL  7.AVL Traverse  8.Exit\nChoice: ");
         scanf("%d", &ch);
         switch (ch)
         {
@@ -196,6 +197,10 @@ int main()
         case 7:
             printf("AVL Inorder: ");
             inorder(avl);
+            printf("\nAVL Preorder: ");
+            preorder(avl);
+            printf("\nAVL Postorder: ");
+            postorder(avl);
             printf("\n");
             break;
         case 8:
