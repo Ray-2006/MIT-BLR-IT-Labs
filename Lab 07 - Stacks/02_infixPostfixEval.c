@@ -4,76 +4,101 @@
 #include <string.h>
 
 // ---------- CHAR STACK ----------
-struct CharNode {
+typedef struct CharNode {
     char data;
-    struct CharNode* next;
-};
+    struct CharNode *next;
+} CharNode;
 
-void pushChar(struct CharNode** top, char c) {
-    struct CharNode* temp = (struct CharNode*)malloc(sizeof(struct CharNode));
-    temp->data = c; temp->next = *top; *top = temp;
+void pushChar(CharNode **top, char c) {
+    CharNode *temp = (CharNode *)malloc(sizeof(CharNode));
+    if (!temp) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    temp->data = c;
+    temp->next = *top;
+    *top = temp;
 }
-char popChar(struct CharNode** top) {
-    if (!*top) return '\0';
-    struct CharNode* temp = *top;
+
+char popChar(CharNode **top) {
+    if (!*top) {
+        return '\0';
+    }
+    CharNode *temp = *top;
     char c = temp->data;
     *top = temp->next;
     free(temp);
     return c;
 }
-char peekChar(struct CharNode* top) { return top ? top->data : '\0'; }
+
+char peekChar(CharNode *top) {
+    return (top ? top->data : '\0');
+}
+
 int precedence(char c) {
-    if(c=='^') return 3;
-    if(c=='*'||c=='/') return 2;
-    if(c=='+'||c=='-') return 1;
-    return 0;
+    switch (c) {
+        case '^': return 3;
+        case '*': case '/': return 2;
+        case '+': case '-': return 1;
+        default: return 0;
+    }
 }
 
 // ---------- INT STACK ----------
-struct IntNode {
+typedef struct IntNode {
     int data;
-    struct IntNode* next;
-};
+    struct IntNode *next;
+} IntNode;
 
-void pushInt(struct IntNode** top, int val) {
-    struct IntNode* temp = (struct IntNode*)malloc(sizeof(struct IntNode));
-    temp->data = val; temp->next = *top; *top = temp;
+void pushInt(IntNode **top, int val) {
+    IntNode *temp = (IntNode *)malloc(sizeof(IntNode));
+    if (!temp) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    temp->data = val;
+    temp->next = *top;
+    *top = temp;
 }
-int popInt(struct IntNode** top) {
+
+int popInt(IntNode **top) {
     if (!*top) {
         printf("Stack underflow\n");
         exit(1);
     }
-    struct IntNode* temp = *top;
+    IntNode *temp = *top;
     int val = temp->data;
     *top = temp->next;
     free(temp);
     return val;
 }
 
-// ---------- i. Infix to Postfix (with spaces) ----------
-void infixToPostfix(char* infix, char* postfix) {
-    struct CharNode* stack = NULL;
+// ---------- i. Infix to Postfix ----------
+void infixToPostfix(char *infix, char *postfix) {
+    CharNode *stack = NULL;
     int k = 0;
+
     for (int i = 0; infix[i]; i++) {
         char c = infix[i];
+
         if (isdigit(c)) {
-            // collect full number
             while (isdigit(infix[i])) {
                 postfix[k++] = infix[i++];
             }
-            postfix[k++] = ' '; // delimiter
-            i--; // step back
+            postfix[k++] = ' ';
+            i--;
         }
-        else if (c=='(') pushChar(&stack, c);
-        else if (c==')') {
-            while (stack && peekChar(stack)!='(') {
+        else if (c == '(') {
+            pushChar(&stack, c);
+        }
+        else if (c == ')') {
+            while (stack && peekChar(stack) != '(') {
                 postfix[k++] = popChar(&stack);
                 postfix[k++] = ' ';
             }
-            popChar(&stack); // remove '('
+            popChar(&stack);
         }
-        else if (c=='+'||c=='-'||c=='*'||c=='/'||c=='^') {
+        else if (strchr("+-*/^", c)) {
             while (stack && precedence(peekChar(stack)) >= precedence(c)) {
                 postfix[k++] = popChar(&stack);
                 postfix[k++] = ' ';
@@ -81,19 +106,22 @@ void infixToPostfix(char* infix, char* postfix) {
             pushChar(&stack, c);
         }
     }
+
     while (stack) {
         postfix[k++] = popChar(&stack);
         postfix[k++] = ' ';
     }
+
     postfix[k] = '\0';
 }
 
-// ---------- ii. Evaluate Postfix (with spaces) ----------
+// ---------- ii. Evaluate Postfix ----------
 int evaluatePostfix(char *expression) {
-    struct IntNode* stack = NULL;
+    IntNode *stack = NULL;
 
-    for (int i = 0; expression[i] != '\0'; i++) {
-        if (expression[i] == ' ') continue;
+    for (int i = 0; expression[i]; i++) {
+        if (expression[i] == ' ')
+            continue;
 
         if (isdigit(expression[i])) {
             int num = 0;
@@ -101,12 +129,13 @@ int evaluatePostfix(char *expression) {
                 num = num * 10 + (expression[i] - '0');
                 i++;
             }
-            i--; // step back
+            i--;
             pushInt(&stack, num);
         }
         else if (strchr("+-*/^", expression[i])) {
             int operand2 = popInt(&stack);
             int operand1 = popInt(&stack);
+
             switch (expression[i]) {
                 case '+': pushInt(&stack, operand1 + operand2); break;
                 case '-': pushInt(&stack, operand1 - operand2); break;
@@ -116,10 +145,12 @@ int evaluatePostfix(char *expression) {
                         printf("Division by zero error\n");
                         exit(1);
                     }
-                    pushInt(&stack, operand1 / operand2); break;
+                    pushInt(&stack, operand1 / operand2);
+                    break;
                 case '^': {
                     int res = 1;
-                    for (int j=0; j<operand2; j++) res *= operand1;
+                    for (int j = 0; j < operand2; j++)
+                        res *= operand1;
                     pushInt(&stack, res);
                     break;
                 }
@@ -129,15 +160,16 @@ int evaluatePostfix(char *expression) {
     return popInt(&stack);
 }
 
+// ---------- MAIN ----------
 int main() {
     char infix[100], postfix[200];
     printf("Enter infix expression: ");
     fgets(infix, sizeof(infix), stdin);
-    infix[strcspn(infix, "\n")] = 0;
+    infix[strcspn(infix, "\n")] = '\0';
 
     infixToPostfix(infix, postfix);
     printf("Postfix: %s\n", postfix);
+    printf("Result: %d\n", evaluatePostfix(postfix));
 
-    printf("Postfix evaluation: %d\n", evaluatePostfix(postfix));
     return 0;
 }

@@ -25,11 +25,35 @@ Node* createNode(int data) {
     return n;
 }
 
+void inorderRec(Node* r) {
+    if (!r) return;
+    inorderRec(r->left);
+    printf("%d ", r->data);
+    inorderRec(r->right);
+}
+
+void preorderRec(Node* r) {
+    if (!r) return;
+    printf("%d ", r->data);
+    preorderRec(r->left);
+    preorderRec(r->right);
+}
+
+void postorderRec(Node* r) {
+    if (!r) return;
+    postorderRec(r->left);
+    postorderRec(r->right);
+    printf("%d ", r->data);
+}
+
 void inorder(Node* r) {
     if (!r) return;
     Node* stack[100]; int top = -1;
     while (r || top != -1) {
-        while (r) { stack[++top] = r; r = r->left; }
+        while (r) { 
+            stack[++top] = r; 
+            r = r->left; 
+        }
         r = stack[top--];
         printf("%d ", r->data);
         r = r->right;
@@ -91,6 +115,12 @@ int countLeaf(Node* r) {
     return countLeaf(r->left) + countLeaf(r->right);
 }
 
+int countIntermediate(Node* r) {
+    if (r == NULL || (r->left == NULL && r->right == NULL))
+        return 0;
+    return 1 + countIntermediate(r->left) + countIntermediate(r->right);
+}
+
 int main() {
     Node* r = createNode(1);
     r->left = createNode(2);
@@ -113,6 +143,7 @@ int main() {
     printf("\nAncestors of %d: ", x);
     if (!printAnc(r, x)) printf("None");
     printf("\nLeaf nodes: %d\n", countLeaf(r));
+    printf("Intermediate nodes: %d\n", countIntermediate(r));
 
     return 0;
 }
