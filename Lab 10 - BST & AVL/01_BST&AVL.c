@@ -16,30 +16,6 @@ Node *createNode(int d)
     n->height = 1;
     return n;
 }
-int height(Node *n) { return n ? n->height : 0; }
-int max(int a, int b) { return a > b ? a : b; }
-int getBalance(Node *n) { return n ? height(n->left) - height(n->right) : 0; }
-
-Node *rightRotate(Node *y)
-{
-    Node *x = y->left;
-    Node *T2 = x->right;
-    x->right = y;
-    y->left = T2;
-    y->height = 1 + max(height(y->left), height(y->right));
-    x->height = 1 + max(height(x->left), height(x->right));
-    return x;
-}
-Node *leftRotate(Node *x)
-{
-    Node *y = x->right;
-    Node *T2 = y->left;
-    y->left = x;
-    x->right = T2;
-    x->height = 1 + max(height(x->left), height(x->right));
-    y->height = 1 + max(height(y->left), height(y->right));
-    return y;
-}
 
 // ---------- BST Functions ----------
 Node *insertBST(Node *root, int d)
@@ -79,15 +55,15 @@ void postorder(Node *r)
         printf("%d ", r->data);
     }
 }
-Node *search(Node *r, int k) { return (!r || r->data == k) ? r : (k < r->data ? search(r->left, k) : search(r->right, k)); }
-Node *findMin(Node *r)
-{
+
+Node *search(Node *r, int k) { 
+    return (!r || r->data == k) ? r : (k < r->data ? search(r->left, k) : search(r->right, k)); }
+Node *findMin(Node *r) {
     while (r && r->left)
         r = r->left;
     return r;
 }
-Node *findMax(Node *r)
-{
+Node *findMax(Node *r) {
     while (r && r->right)
         r = r->right;
     return r;
@@ -117,10 +93,36 @@ Node *deleteBST(Node *r, int k)
 }
 
 // ---------- AVL Insert ----------
+
+int height(Node *n) { return n ? n->height : 0; }
+int max(int a, int b) { return a > b ? a : b; }
+int getBalance(Node *n) { return n ? height(n->left) - height(n->right) : 0; }
+
+Node *rightRotate(Node *y)
+{
+    Node *x = y->left;
+    Node *T2 = x->right;
+    x->right = y;
+    y->left = T2;
+    y->height = 1 + max(height(y->left), height(y->right));
+    x->height = 1 + max(height(x->left), height(x->right));
+    return x;
+}
+Node *leftRotate(Node *x)
+{
+    Node *y = x->right;
+    Node *T2 = y->left;
+    y->left = x;
+    x->right = T2;
+    x->height = 1 + max(height(x->left), height(x->right));
+    y->height = 1 + max(height(y->left), height(y->right));
+    return y;
+}
+
 Node *insertAVL(Node *n, int d)
 {
-    if (!n)
-        return createNode(d);
+    if (!n) return createNode(d);
+    
     if (d < n->data)
         n->left = insertAVL(n->left, d);
     else if (d > n->data)

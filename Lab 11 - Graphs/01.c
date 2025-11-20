@@ -11,6 +11,7 @@ typedef struct Node {
     int vertex;
     Node* next;
 } Node;
+
 Node* adjList[MAX];
 
 void createAdjMatrix(int directed) {
