@@ -19,8 +19,9 @@ void enqueue(Queue *q, int val) {
         printf("Queue Full!\n");
         return;
     }
-    if (isEmpty(q))
-        q->front = 0;
+    if (isEmpty(q)){ 
+        q->front = 0; 
+    }
     q->rear = (q->rear + 1) % MAX;
     q->arr[q->rear] = val;
     printf("Inserted: %d\n", val);
