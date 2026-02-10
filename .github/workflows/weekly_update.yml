@@ -45,6 +45,9 @@ jobs:
       - name: Update DS
         run: bash ./lab_manage.sh update https://github.com/Krekensis/ds_lab_sem3_2025.git "Semester 3" DS main
 
+      - name: Update OOSD
+        run: bash ./lab_manage.sh update https://github.com/Krekensis/oosd_lab_sem4_2026.git "Semester 4" OOSD main
+        
       - name: Push updates
         run: |
           git fetch origin main
