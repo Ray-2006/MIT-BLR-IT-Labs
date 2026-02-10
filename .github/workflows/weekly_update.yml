@@ -14,36 +14,21 @@ jobs:
       issues: write
 
     steps:
+      - name: Configure GitHub auth for private repos
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Check PAT availability
-        run: |
-          if [ -z "${{ secrets.PAT_TOKEN }}" ]; then
-            echo "❌ LAB_REPO_TOKEN is EMPTY or UNAVAILABLE"
-            exit 1
-          else
-            echo "✅ LAB_REPO_TOKEN is AVAILABLE"
-          fi
-
-      - name: PAT access check
-        run: |
-          git ls-remote https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/Krekensis/pps_lab_sem1_2024.git
-
-
-      - name: Configure GitHub auth for private repos
-        run: |
-          git config --global \
-            url."https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/".insteadOf \
-            "https://github.com/"
 
       - name: Make lab_manage.sh executable
         run: chmod +x ./lab_manage.sh
