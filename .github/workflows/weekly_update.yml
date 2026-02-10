@@ -25,6 +25,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: PAT access check
+        run: |
+          git ls-remote https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/Krekensis/pps_lab_sem1_2024.git
+
+
       - name: Configure GitHub auth for private repos
         run: |
           git config --global \
