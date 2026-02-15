@@ -38,7 +38,7 @@ if [ "$ACTION" = "add" ]; then
   git subtree add --prefix="$TARGET_PATH" "$REMOTE_NAME" "$BRANCH" -m "Add $LAB_NAME subtree"
 elif [ "$ACTION" = "update" ]; then
   echo "Updating $LAB_NAME in $TARGET_PATH"
-  git subtree pull --prefix="$TARGET_PATH" "$REMOTE_NAME" "$BRANCH" -m "Update $LAB_NAME subtree"
+  git subtree pull --prefix="$TARGET_PATH" "$REMOTE_NAME" "$BRANCH" -X ours -m "Update $LAB_NAME subtree"
 else
   echo "Unknown action: $ACTION (use 'add' or 'update')"
   exit 1
